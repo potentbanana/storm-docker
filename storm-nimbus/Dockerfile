@@ -1,8 +1,8 @@
-FROM wurstmeister/storm:0.9.4
-MAINTAINER Wurstmeister
+FROM storm:latest
+MAINTAINER Will Cliffe <will@nerdcorn.com>
 
-RUN /usr/bin/config-supervisord.sh nimbus 
-RUN /usr/bin/config-supervisord.sh drpc
+#RUN /usr/bin/config-supervisord.sh nimbus 
+#RUN /usr/bin/config-supervisord.sh drpc
 
 EXPOSE 6627
 EXPOSE 3772
