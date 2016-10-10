@@ -5,4 +5,3 @@ sed -i -e "s/%nimbus%/$IP/g" $STORM_HOME/conf/storm.yaml
 
 echo "storm.local.hostname: `hostname -i`" >> $STORM_HOME/conf/storm.yaml
 
-supervisord
