@@ -15,8 +15,9 @@ RUN pip3 install requests
 
 RUN /usr/bin/config-supervisord.sh supervisor
 RUN /usr/bin/config-supervisord.sh logviewer
-CMD /usr/bin/start-supervisor.sh
 
+ADD start-supervisor.sh /usr/bin/start-supervisor.sh
+CMD /usr/bin/start-supervisor.sh
 
 
 
