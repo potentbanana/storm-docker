@@ -6,6 +6,10 @@ services:
     ports: 
       - "49181:2181"
       - "22"
+    container_name: zookeeper
+    networks:
+      stormnet:
+        ipv4_address: 172.24.0.2
   nimbus:
     build:
       context: ./storm-nimbus
@@ -15,30 +19,111 @@ services:
       - "49772:3772"
       - "49627:6627"
       - "22"
+      - "9002:9001"
     links: 
       - zookeeper:zk
+    container_name: nimbus
+    networks:
+      stormnet:
+        ipv4_address: 172.24.0.4
   supervisor:
+    container_name: supervisor
     build:
         context: ./storm-supervisor
         dockerfile: Dockerfile
     ports:
       - "8000"
       - "22"
+      - "9003:9001"
     links: 
       - nimbus:nimbus
       - zookeeper:zk
+      - kafka:kafka
+    networks:
+      stormnet:
+        ipv4_address: 172.24.0.10
+  supervisor2:
+    container_name: supervisor2
+    build:
+        context: ./storm-supervisor
+        dockerfile: Dockerfile
+    ports:
+      - "8000"
+      - "22"
+      - "9005:9001"
+    links: 
+      - nimbus:nimbus
+      - zookeeper:zk
+      - kafka:kafka
+    networks:
+      stormnet:
+        ipv4_address: 172.24.0.11
+  supervisor3:
+    container_name: supervisor3
+    build:
+        context: ./storm-supervisor
+        dockerfile: Dockerfile
+    ports:
+      - "8000"
+      - "22"
+      - "9006:9001"
+    links: 
+      - nimbus:nimbus
+      - zookeeper:zk
+      - kafka:kafka
+    networks:
+      stormnet:
+        ipv4_address: 172.24.0.12
   ui:
+    container_name: ui
     build:
         context: ./storm-ui
         dockerfile: Dockerfile
     ports:
       - "49080:8080"
       - "22"
+      - "9004:9001"
     links: 
       - nimbus:nimbus
       - zookeeper:zk
-  mongodb:
-    build: ./mongodb
+    networks:
+      stormnet:
+        ipv4_address: 172.24.0.3
+  kafka:
+    image: confluent/kafka:latest
+    container_name: kafka
     ports:
-      - "27017"
+      - "49092:9092"
+    depends_on:
+      - zookeeper
+    restart: always
+    networks:
+      stormnet:
+        ipv4_address: 172.24.0.7
+  statsd:
+    image: matejkramny/graphite-statsd    
+    ports: 
+      - "48080:80"
+      - "8125:8125/udp"
+      - "22"
+    container_name: statsd
+    networks:
+      stormnet:
+        ipv4_address: 172.24.0.8
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+      - "22"
+    restart: always
+    networks:
+      stormnet:
+        ipv4_address: 172.24.0.25
 
+networks:
+  stormnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.24.0.0/16
+          gateway: 172.24.0.1
